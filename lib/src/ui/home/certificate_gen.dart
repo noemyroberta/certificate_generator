@@ -5,6 +5,11 @@ class CertificateGen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return MaterialApp(
+      title: 'WIT Certificate Gen',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.light(),
+      home: const Scaffold(),
+    );
   }
 }
