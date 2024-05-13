@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/wit_md_certificate_gen.iml" filepath="$PROJECT_DIR$/wit_md_certificate_gen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/wit_md_certificate_gen_android.iml" filepath="$PROJECT_DIR$/android/wit_md_certificate_gen_android.iml" />
+    </modules>
+  </component>
+</project>
