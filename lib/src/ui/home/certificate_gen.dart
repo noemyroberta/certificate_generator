@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
+import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/strings.dart';
 
 import 'components/header.dart';
@@ -34,50 +35,11 @@ class CertificateGen extends StatelessWidget {
             Container(
               color: Colors.white70,
               padding: const EdgeInsets.all(40),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    backgroundTitleText,
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontFamily: 'RobotoSlab',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 25,
-                    ),
-                  ),
-                  const Text(
-                    backgroundSubtitleText,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontFamily: 'RobotoSlab',
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    style: ButtonStyle(
-                      foregroundColor: MaterialStateColor.resolveWith(
-                          (states) => primaryColor),
-                      backgroundColor: MaterialStateColor.resolveWith(
-                          (states) => primaryColor),
-                    ),
-                    onPressed: () {},
-                    icon: const Icon(Icons.photo, color: Colors.white),
-                    label: const Text(
-                      'Inserir fundo',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'RobotoSlab',
-                        fontWeight: FontWeight.normal,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
+              child: const FileSection(
+                title: backgroundTitleText,
+                subtitle: backgroundSubtitleText,
+                buttonIcon: Icons.photo,
+                buttonTitle: 'Insira o fundo',
               ),
             )
           ],
