@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/strings.dart';
 
+import 'components/header.dart';
+
 class CertificateGen extends StatelessWidget {
   const CertificateGen({super.key});
 
@@ -20,28 +22,11 @@ class CertificateGen extends StatelessWidget {
             SizedBox(
               height: size.height * 0.1,
               width: double.infinity,
-              child: ColoredBox(
+              child: const ColoredBox(
                 color: primaryColor,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      const Text(
-                        'Gerador de Certificado',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'RobotoSlab',
-                          fontWeight: FontWeight.normal,
-                          fontSize: 25,
-                        ),
-                      ),
-                      Image.asset(
-                        "assets/logo-laccan-completa-branca.png",
-                        width: 250,
-                      ),
-                    ],
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Header(),
                 ),
               ),
             ),
