@@ -12,7 +12,7 @@ class FileSection extends StatelessWidget {
     this.buttonIcon,
     this.buttonBackgroundColor,
     this.buttonTitleColor,
-    this.onGettedFile,
+    this.gettedFileName,
     this.onPressed,
   }) : super(key: key);
 
@@ -23,7 +23,7 @@ class FileSection extends StatelessWidget {
   final Color? buttonBackgroundColor;
   final Color? buttonTitleColor;
   final void Function()? onPressed;
-  final dynamic Function(dynamic fileName)? onGettedFile;
+  final String? gettedFileName;
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +74,10 @@ class FileSection extends StatelessWidget {
                 ),
               ),
             ),
-            if (onGettedFile != null)
+            const SizedBox(width: 10),
+            if (gettedFileName != null)
               Text(
-                onGettedFile!(dynamic).toString(),
+                gettedFileName!,
                 style: const TextStyle(
                   color: Colors.black,
                   fontFamily: 'RobotoSlab',
