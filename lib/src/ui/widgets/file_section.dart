@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import 'colors.dart';
@@ -13,6 +12,8 @@ class FileSection extends StatelessWidget {
     this.buttonIcon,
     this.buttonBackgroundColor,
     this.buttonTitleColor,
+    this.onGettedFile,
+    this.onPressed,
   }) : super(key: key);
 
   final String title;
@@ -21,6 +22,8 @@ class FileSection extends StatelessWidget {
   final IconData? buttonIcon;
   final Color? buttonBackgroundColor;
   final Color? buttonTitleColor;
+  final void Function()? onPressed;
+  final dynamic Function(dynamic fileName)? onGettedFile;
 
   @override
   Widget build(BuildContext context) {
@@ -48,26 +51,40 @@ class FileSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        ElevatedButton.icon(
-          style: ButtonStyle(
-            foregroundColor:
-                MaterialStateColor.resolveWith((states) => primaryColor),
-            backgroundColor: MaterialStateColor.resolveWith(
-                (states) => buttonBackgroundColor ?? primaryColor),
-          ),
-          onPressed: () {},
-          icon: buttonIcon != null
-              ? Icon(buttonIcon, color: Colors.white)
-              : const SizedBox(),
-          label: Text(
-            buttonTitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: 'RobotoSlab',
-              fontWeight: FontWeight.normal,
-              fontSize: 14,
+        Row(
+          children: [
+            ElevatedButton.icon(
+              style: ButtonStyle(
+                foregroundColor:
+                    MaterialStateColor.resolveWith((states) => primaryColor),
+                backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => buttonBackgroundColor ?? primaryColor),
+              ),
+              onPressed: onPressed,
+              icon: buttonIcon != null
+                  ? Icon(buttonIcon, color: Colors.white)
+                  : const SizedBox(),
+              label: Text(
+                buttonTitle,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'RobotoSlab',
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14,
+                ),
+              ),
             ),
-          ),
+            if (onGettedFile != null)
+              Text(
+                onGettedFile!(dynamic).toString(),
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'RobotoSlab',
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14,
+                ),
+              ),
+          ],
         ),
       ],
     );
