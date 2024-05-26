@@ -1,8 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
-import 'package:dotted_border/dotted_border.dart';
+import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/strings.dart';
@@ -19,8 +22,7 @@ class CertificateGen extends StatefulWidget {
 class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
-  
-  final aereaKey = GlobalKey();
+  List<List<dynamic>> csvData = [];
 
   @override
   Widget build(BuildContext context) {
@@ -67,42 +69,20 @@ class _CertificateGenState extends State<CertificateGen> {
                           gettedFileName: imageName,
                         ),
                         const SizedBox(height: 50),
-                        const FileSection(
+                        FileSection(
                           title: csvTitleText,
                           subtitle: csvSubtitleText,
                           buttonIcon: Icons.file_upload,
                           buttonTitle: 'Insira o arquivo CSV',
+                          onPressed: _uploadFile,
                         ),
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: SizedBox(
-                      key: aereaKey,
-                      height: size.height * 0.5,
-                      child: ColoredBox(
-                        color: primaryColor,
-                        child: Stack(
-                          children: [
-                            imageBytes != null
-                                ? Image.memory(imageBytes!)
-                                : const Center(
-                                    child: Text(
-                                      'Seu fundo aparece aqui',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'RobotoSlab',
-                                        fontWeight: FontWeight.normal,
-                                        fontStyle: FontStyle.italic,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                            
-                          ],
-                        ),
-                      ),
-                    ),
+                  CertificateViewer(
+                    imageBytes: imageBytes,
+                    imageName: imageName,
+                    csvData: csvData,
                   ),
                 ],
               ),
@@ -128,5 +108,21 @@ class _CertificateGenState extends State<CertificateGen> {
     }
   }
 
-  
+  void _uploadFile() async {
+    FilePickerResult? result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['csv']);
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      Uint8List fileBytes = file.bytes!;
+      String content = utf8.decode(fileBytes);
+      log(content);
+
+      List<List<dynamic>> csvTable =
+          const CsvToListConverter().convert(content);
+      setState(() {
+        csvData = csvTable;
+      });
+    }
+  }
 }

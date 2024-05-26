@@ -60,10 +60,9 @@ class _DraggableTextState extends State<DraggableText> {
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(8)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: SizedBox(
-            child: Text(
-              text,
+            child: DefaultTextStyle(
               style: TextStyle(
                 color: fontColor ?? Colors.black,
                 fontFamily: 'RobotoSlab',
@@ -71,6 +70,7 @@ class _DraggableTextState extends State<DraggableText> {
                 fontStyle: FontStyle.italic,
                 fontSize: fontSize ?? 20,
               ),
+              child: Text(text),
             ),
           ),
         ),
