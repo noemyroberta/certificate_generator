@@ -19,6 +19,8 @@ class CertificateGen extends StatefulWidget {
 class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
+  Offset _offset = const Offset(0, 0);
+  final aereaKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -76,77 +78,44 @@ class _CertificateGenState extends State<CertificateGen> {
                   ),
                   Expanded(
                     child: SizedBox(
+                      key: aereaKey,
                       height: size.height * 0.5,
                       child: ColoredBox(
                         color: primaryColor,
                         child: Stack(
                           children: [
-                            InteractiveViewer(
-                              boundaryMargin: const EdgeInsets.all(42),
-                              child: imageBytes != null
-                                  ? Image.memory(imageBytes!)
-                                  : const Center(
-                                      child: Text(
-                                        'Seu fundo aparece aqui',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'RobotoSlab',
-                                          fontWeight: FontWeight.normal,
-                                          fontStyle: FontStyle.italic,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                            Draggable<String>(
-                              data: "Lucy Roberta Santos",
-                              feedback: DottedBorder(
-                                borderType: BorderType.RRect,
-                                radius: Radius.circular(8),
-                                color: Colors.black,
-                                strokeWidth: 1,
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                  child: Container(
-                                    color: Colors.white,
+                            imageBytes != null
+                                ? Image.memory(imageBytes!)
+                                : const Center(
                                     child: Text(
-                                      'Lucy Roberta Santos',
+                                      'Seu fundo aparece aqui',
                                       style: TextStyle(
-                                        color: Colors.black,
+                                        color: Colors.white,
                                         fontFamily: 'RobotoSlab',
                                         fontWeight: FontWeight.normal,
                                         fontStyle: FontStyle.italic,
-                                        fontSize: 18,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              childWhenDragging: const SizedBox(),
-                              child: DottedBorder(
-                                borderType: BorderType.RRect,
-                                radius: Radius.circular(8),
-                                color: Colors.black,
-                                strokeWidth: 1,
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                                    color: Colors.white,
-                                    child: Text(
-                                      'Lucy Roberta Santos',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: 'RobotoSlab',
-                                        fontWeight: FontWeight.normal,
-                                        fontStyle: FontStyle.italic,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                            Positioned(
+                              left: _offset.dx,
+                              top: _offset.dy,
+                              child: Draggable(
+                                data: 'Lucy Roberta Santos',
+                                feedback: _buildDraggableText(),
+                                childWhenDragging: _buildDraggableText(),
+                                onDragEnd: (drag) {
+                                  RenderBox? renderBox = aereaKey
+                                      .currentContext!
+                                      .findRenderObject() as RenderBox;
+                                  final localOffset =
+                                      renderBox.globalToLocal(drag.offset);
+                                  setState(() {
+                                    _offset = localOffset;
+                                  });
+                                },
+                                child: _buildDraggableText(),
                               ),
                             ),
                           ],
@@ -176,5 +145,32 @@ class _CertificateGenState extends State<CertificateGen> {
         imageName = name;
       });
     }
+  }
+
+  Widget _buildDraggableText() {
+    return DottedBorder(
+      borderType: BorderType.RRect,
+      radius: const Radius.circular(8),
+      color: Colors.white,
+      strokeWidth: 2,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: SizedBox(
+            child: Text(
+              'Lucy Roberta Santos',
+              style: TextStyle(
+                color: Colors.black,
+                fontFamily: 'RobotoSlab',
+                fontWeight: FontWeight.normal,
+                fontStyle: FontStyle.italic,
+                fontSize: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
