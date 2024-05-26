@@ -19,7 +19,7 @@ class CertificateGen extends StatefulWidget {
 class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
-  Offset _offset = const Offset(0, 0);
+  
   final aereaKey = GlobalKey();
 
   @override
@@ -98,26 +98,7 @@ class _CertificateGenState extends State<CertificateGen> {
                                       ),
                                     ),
                                   ),
-                            Positioned(
-                              left: _offset.dx,
-                              top: _offset.dy,
-                              child: Draggable(
-                                data: 'Lucy Roberta Santos',
-                                feedback: _buildDraggableText(),
-                                childWhenDragging: _buildDraggableText(),
-                                onDragEnd: (drag) {
-                                  RenderBox? renderBox = aereaKey
-                                      .currentContext!
-                                      .findRenderObject() as RenderBox;
-                                  final localOffset =
-                                      renderBox.globalToLocal(drag.offset);
-                                  setState(() {
-                                    _offset = localOffset;
-                                  });
-                                },
-                                child: _buildDraggableText(),
-                              ),
-                            ),
+                            
                           ],
                         ),
                       ),
@@ -147,30 +128,5 @@ class _CertificateGenState extends State<CertificateGen> {
     }
   }
 
-  Widget _buildDraggableText() {
-    return DottedBorder(
-      borderType: BorderType.RRect,
-      radius: const Radius.circular(8),
-      color: Colors.white,
-      strokeWidth: 2,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: SizedBox(
-            child: Text(
-              'Lucy Roberta Santos',
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: 'RobotoSlab',
-                fontWeight: FontWeight.normal,
-                fontStyle: FontStyle.italic,
-                fontSize: 20,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  
 }
