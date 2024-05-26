@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
@@ -78,22 +79,77 @@ class _CertificateGenState extends State<CertificateGen> {
                       height: size.height * 0.5,
                       child: ColoredBox(
                         color: primaryColor,
-                        child: InteractiveViewer(
-                          boundaryMargin: const EdgeInsets.all(42),
-                          child: imageBytes != null
-                              ? Image.memory(imageBytes!)
-                              : const Center(
-                                  child: Text(
-                                    'Seu fundo aparece aqui',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'RobotoSlab',
-                                      fontWeight: FontWeight.normal,
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 14,
+                        child: Stack(
+                          children: [
+                            InteractiveViewer(
+                              boundaryMargin: const EdgeInsets.all(42),
+                              child: imageBytes != null
+                                  ? Image.memory(imageBytes!)
+                                  : const Center(
+                                      child: Text(
+                                        'Seu fundo aparece aqui',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'RobotoSlab',
+                                          fontWeight: FontWeight.normal,
+                                          fontStyle: FontStyle.italic,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            Draggable<String>(
+                              data: "Lucy Roberta Santos",
+                              feedback: DottedBorder(
+                                borderType: BorderType.RRect,
+                                radius: Radius.circular(8),
+                                color: Colors.black,
+                                strokeWidth: 1,
+                                child: ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
+                                  child: Container(
+                                    color: Colors.white,
+                                    child: Text(
+                                      'Lucy Roberta Santos',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'RobotoSlab',
+                                        fontWeight: FontWeight.normal,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 18,
+                                      ),
                                     ),
                                   ),
                                 ),
+                              ),
+                              childWhenDragging: const SizedBox(),
+                              child: DottedBorder(
+                                borderType: BorderType.RRect,
+                                radius: Radius.circular(8),
+                                color: Colors.black,
+                                strokeWidth: 1,
+                                child: ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                                    color: Colors.white,
+                                    child: Text(
+                                      'Lucy Roberta Santos',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'RobotoSlab',
+                                        fontWeight: FontWeight.normal,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
