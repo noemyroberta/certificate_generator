@@ -37,8 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   file_picker: ^8.0.3
   dotted_border: ^2.1.0
-  flutter_dropzone: ^4.0.0
   csv: ^6.0.0
+  flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
   flutter_test:
