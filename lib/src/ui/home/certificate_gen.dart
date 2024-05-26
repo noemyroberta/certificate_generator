@@ -34,12 +34,48 @@ class CertificateGen extends StatelessWidget {
             SizedBox(height: size.height * 0.2),
             Container(
               color: Colors.white70,
-              padding: const EdgeInsets.all(40),
-              child: const FileSection(
-                title: backgroundTitleText,
-                subtitle: backgroundSubtitleText,
-                buttonIcon: Icons.photo,
-                buttonTitle: 'Insira o fundo',
+              padding: const EdgeInsets.symmetric(horizontal: 120),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                    width: size.width * 0.5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const FileSection(
+                          title: backgroundTitleText,
+                          subtitle: backgroundSubtitleText,
+                          buttonIcon: Icons.photo,
+                          buttonTitle: 'Insira o fundo',
+                        ),
+                        const SizedBox(height: 50),
+                        const FileSection(
+                          title: csvTitleText,
+                          subtitle: csvSubtitleText,
+                          buttonIcon: Icons.file_upload,
+                          buttonTitle: 'Insira o arquivo CSV',
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: SizedBox(
+                      height: size.height * 0.5,
+                      child: ColoredBox(
+                        color: primaryColor,
+                        child: InteractiveViewer(
+                          boundaryMargin: const EdgeInsets.all(42),
+                          child: Image.asset(
+                            'assets/1.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             )
           ],
