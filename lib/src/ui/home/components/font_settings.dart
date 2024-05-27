@@ -7,14 +7,10 @@ import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 class FontSettings extends StatefulWidget {
   const FontSettings({
     super.key,
-    required this.position,
-    required this.text,
     this.onColorPicked,
     this.onFontSizeChanged,
   });
 
-  final int position;
-  final String text;
   final Function(Color)? onColorPicked;
   final Function(int)? onFontSizeChanged;
 
@@ -23,8 +19,6 @@ class FontSettings extends StatefulWidget {
 }
 
 class _FontSettingsState extends State<FontSettings> {
-  int get position => widget.position;
-  String get text => widget.text;
   late Color pickedColor;
 
   void changeColor(Color color) {
@@ -55,15 +49,6 @@ class _FontSettingsState extends State<FontSettings> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '#${position.toString()} - $text',
-          style: const TextStyle(
-            color: Colors.black87,
-            fontFamily: 'RobotoSlab',
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -71,7 +56,7 @@ class _FontSettingsState extends State<FontSettings> {
           children: [
             FileSection(
               title: 'Cor',
-              titleSize: 12,
+              titleSize: 14,
               subtitle: 'Selecione a cor do texto correspondente.',
               buttonTitle: 'Selecionar a cor',
               buttonBackgroundColor: Colors.purple[300],
@@ -90,7 +75,7 @@ class _FontSettingsState extends State<FontSettings> {
                     color: Colors.black87,
                     fontFamily: 'RobotoSlab',
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                    fontSize: 14,
                   ),
                 ),
                 InputIncrementDecrement(
@@ -122,7 +107,6 @@ class _FontSettingsState extends State<FontSettings> {
             ElevatedButton(
               child: const Text('OK'),
               onPressed: () {
-                //setState(() => currentColor = pickerColor);
                 Navigator.of(context).pop();
               },
             ),

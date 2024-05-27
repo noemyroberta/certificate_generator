@@ -26,6 +26,8 @@ class _CertificateGenState extends State<CertificateGen> {
   String imageName = '';
   GlobalKey aereaKey = GlobalKey();
   Map<int, Map<String, dynamic>> csv = {};
+  String selectedText = '';
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -82,25 +84,48 @@ class _CertificateGenState extends State<CertificateGen> {
                           ),
                           const SizedBox(height: 50),
                           if (csv.isNotEmpty)
-                            ...csv.entries.map((entry) {
-                              int index = entry.key;
-                              String text = entry.value['value'];
+                            const Text(
+                              'Selecione o texto para customizar',
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontFamily: 'RobotoSlab',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          if (csv.isNotEmpty)
+                            DropdownButton<String>(
+                              value: selectedText,
+                              items: csv.entries.map((entry) {
+                                int index = entry.key;
+                                String text = entry.value['value'];
 
-                              return FontSettings(
-                                position: index,
-                                text: text,
-                                onFontSizeChanged: (newValue) {
-                                  setState(() {
-                                    csv[index]!['size'] = newValue;
-                                  });
-                                },
-                                onColorPicked: (newColor) {
-                                  setState(() {
-                                    csv[index]!['color'] = newColor;
-                                  });
-                                },
-                              );
-                            }),
+                                return DropdownMenuItem<String>(
+                                  value: '#${index + 1} $text',
+                                  child: Text('#${index + 1} $text'),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedText = newValue!;
+                                  selectedIndex =
+                                      int.parse(newValue.substring(1, 2)) - 1;
+                                });
+                              },
+                            ),
+                          if (csv.isNotEmpty)
+                            FontSettings(
+                              onFontSizeChanged: (newValue) {
+                                setState(() {
+                                  csv[selectedIndex]!['size'] = newValue;
+                                });
+                              },
+                              onColorPicked: (newColor) {
+                                setState(() {
+                                  csv[selectedIndex]!['color'] = newColor;
+                                });
+                              },
+                            ),
                         ],
                       ),
                     ),
@@ -181,7 +206,9 @@ class _CertificateGenState extends State<CertificateGen> {
         };
       }
     }
-    setState(() {});
+    setState(() {
+      selectedText = "#1 ${csv[0]!['value']}";
+    });
   }
 
   double? _getFontSizeByPos(int position) {
