@@ -52,7 +52,7 @@ class _FontSettingsState extends State<FontSettings> {
             const SizedBox(width: 12),
             FileSection(
               title: 'Cor',
-              subtitle: 'Selecione a cor desse texto',
+              subtitle: 'Selecione a cor do texto correspondente.',
               buttonTitle: 'Selecionar a cor',
               buttonIcon: Icons.color_lens,
               onPressed: () {
