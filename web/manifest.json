@@ -1,11 +1,11 @@
 {
-    "name": "wit_md_certificate_gen",
-    "short_name": "wit_md_certificate_gen",
+    "name": "WIT Certificate Generator",
+    "short_name": "WIT Certificate Gen",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
