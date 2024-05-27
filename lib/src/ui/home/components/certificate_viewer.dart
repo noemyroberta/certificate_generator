@@ -6,24 +6,24 @@ import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
 import '../../widgets/colors.dart';
 
 class CertificateViewer extends StatefulWidget {
+  // ignore: use_super_parameters
   const CertificateViewer({
-    super.key,
+    Key? key,
     required this.imageBytes,
     required this.imageName,
-    required this.csvData,
-  });
+    required this.texts,
+  }) : super(key: key);
 
   final Uint8List? imageBytes;
   final String? imageName;
-  final List<List<dynamic>> csvData;
+  final List<DraggableText> texts;
 
   @override
   State<CertificateViewer> createState() => _CertificateViewerState();
 }
 
 class _CertificateViewerState extends State<CertificateViewer> {
-  final _aereaKey = GlobalKey();
-  List<List<dynamic>> get csv => widget.csvData;
+  List<DraggableText> get texts => widget.texts;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,6 @@ class _CertificateViewerState extends State<CertificateViewer> {
 
     return Expanded(
       child: SizedBox(
-        key: _aereaKey,
         height: size.height * 0.5,
         child: ColoredBox(
           color: primaryColor,
@@ -51,13 +50,7 @@ class _CertificateViewerState extends State<CertificateViewer> {
                         ),
                       ),
                     ),
-              if (csv.isNotEmpty)
-                ...csv[0].map(
-                  (e) => DraggableText(
-                    aereaKey: _aereaKey,
-                    text: e.toString(),
-                  ),
-                )
+              if (texts.isNotEmpty) ...texts,
             ],
           ),
         ),

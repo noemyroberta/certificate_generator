@@ -14,9 +14,11 @@ class FileSection extends StatelessWidget {
     this.buttonTitleColor,
     this.gettedFileName,
     this.onPressed,
+    this.titleSize,
   }) : super(key: key);
 
   final String title;
+  final double? titleSize;
   final String subtitle;
   final String buttonTitle;
   final IconData? buttonIcon;
@@ -33,11 +35,11 @@ class FileSection extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.black87,
             fontFamily: 'RobotoSlab',
             fontWeight: FontWeight.w500,
-            fontSize: 25,
+            fontSize: titleSize ?? 25,
           ),
         ),
         Text(

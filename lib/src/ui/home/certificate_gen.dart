@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
+import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/strings.dart';
 
@@ -23,8 +24,8 @@ class CertificateGen extends StatefulWidget {
 class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
-  List<List<dynamic>> csvData = [];
-  int? position;
+  GlobalKey aereaKey = GlobalKey();
+  Map<int, Map<String, dynamic>> csv = {};
 
   @override
   Widget build(BuildContext context) {
@@ -79,25 +80,47 @@ class _CertificateGenState extends State<CertificateGen> {
                             buttonTitle: 'Insira o arquivo CSV',
                             onPressed: _uploadFile,
                           ),
-                          const SizedBox(height: 20),
-                          if (csvData.isNotEmpty)
-                            ...csvData[0].map((e) {
-                              position = position! + 1;
+                          const SizedBox(height: 50),
+                          if (csv.isNotEmpty)
+                            ...csv.entries.map((entry) {
+                              int index = entry.key;
+                              String text = entry.value['value'];
+
                               return FontSettings(
-                                position: position!,
-                                text: e.toString(),
-                                onColorPicked: (color) {
-                                  
+                                position: index,
+                                text: text,
+                                onFontSizeChanged: (newValue) {
+                                  setState(() {
+                                    csv[index]!['size'] = newValue;
+                                  });
+                                },
+                                onColorPicked: (newColor) {
+                                  setState(() {
+                                    csv[index]!['color'] = newColor;
+                                  });
                                 },
                               );
-                            })
+                            }),
                         ],
                       ),
                     ),
                     CertificateViewer(
+                      key: aereaKey,
                       imageBytes: imageBytes,
                       imageName: imageName,
-                      csvData: csvData,
+                      texts: csv.isNotEmpty
+                          ? csv.entries.map((entry) {
+                              int index = entry.key;
+                              final value = entry.value;
+
+                              return DraggableText(
+                                aereaKey: aereaKey,
+                                fontSize: _getFontSizeByPos(index),
+                                fontColor: _getColorByPos(index),
+                                text: getWithNoSpaceAtTheEnd(value['value']),
+                              );
+                            }).toList()
+                          : [],
                     ),
                   ],
                 ),
@@ -107,6 +130,15 @@ class _CertificateGenState extends State<CertificateGen> {
         ),
       ),
     );
+  }
+
+  String getWithNoSpaceAtTheEnd(String text) {
+    if (text.endsWith(' ')) {
+      log('yes');
+      String value = text.substring(0, text.length - 1);
+      return value;
+    }
+    return text;
   }
 
   void _uploadImage() async {
@@ -135,10 +167,38 @@ class _CertificateGenState extends State<CertificateGen> {
 
       List<List<dynamic>> csvTable =
           const CsvToListConverter().convert(content);
-      setState(() {
-        csvData = csvTable;
-        position = 0;
-      });
+      _initializeFontSettings(csvTable);
     }
+  }
+
+  void _initializeFontSettings(List<List<dynamic>> csvTable) {
+    if (csvTable.isNotEmpty) {
+      for (int i = 0; i < csvTable[0].length; i++) {
+        csv[i] = {
+          'value': csvTable[0][i].toString(),
+          'size': 20,
+          'color': Colors.black87,
+        };
+      }
+    }
+    setState(() {});
+  }
+
+  double? _getFontSizeByPos(int position) {
+    for (final setting in csv.entries) {
+      if (setting.key == position) {
+        return setting.value['size'];
+      }
+    }
+    return null;
+  }
+
+  Color? _getColorByPos(int position) {
+    for (var element in csv.entries) {
+      if (element.key == position) {
+        return element.value['color'];
+      }
+    }
+    return null;
   }
 }
