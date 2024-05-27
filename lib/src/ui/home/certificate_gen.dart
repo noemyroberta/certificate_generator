@@ -6,6 +6,7 @@ import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/strings.dart';
@@ -23,6 +24,7 @@ class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
   List<List<dynamic>> csvData = [];
+  int? position;
 
   @override
   Widget build(BuildContext context) {
@@ -34,60 +36,74 @@ class _CertificateGenState extends State<CertificateGen> {
       theme: ThemeData.light(),
       home: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Column(
-          children: [
-            SizedBox(
-              height: size.height * 0.1,
-              width: double.infinity,
-              child: const ColoredBox(
-                color: primaryColor,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Header(),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: size.height * 0.1,
+                width: double.infinity,
+                child: const ColoredBox(
+                  color: primaryColor,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Header(),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: size.height * 0.2),
-            Container(
-              color: Colors.white70,
-              padding: const EdgeInsets.symmetric(horizontal: 120),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    width: size.width * 0.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FileSection(
-                          title: backgroundTitleText,
-                          subtitle: backgroundSubtitleText,
-                          buttonIcon: Icons.photo,
-                          buttonTitle: 'Insira o fundo',
-                          onPressed: _uploadImage,
-                          gettedFileName: imageName,
-                        ),
-                        const SizedBox(height: 50),
-                        FileSection(
-                          title: csvTitleText,
-                          subtitle: csvSubtitleText,
-                          buttonIcon: Icons.file_upload,
-                          buttonTitle: 'Insira o arquivo CSV',
-                          onPressed: _uploadFile,
-                        ),
-                      ],
+              SizedBox(height: size.height * 0.2),
+              Container(
+                color: Colors.white70,
+                padding: const EdgeInsets.symmetric(horizontal: 120),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SizedBox(
+                      width: size.width * 0.5,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FileSection(
+                            title: backgroundTitleText,
+                            subtitle: backgroundSubtitleText,
+                            buttonIcon: Icons.photo,
+                            buttonTitle: 'Insira o fundo',
+                            onPressed: _uploadImage,
+                            gettedFileName: imageName,
+                          ),
+                          const SizedBox(height: 50),
+                          FileSection(
+                            title: csvTitleText,
+                            subtitle: csvSubtitleText,
+                            buttonIcon: Icons.file_upload,
+                            buttonTitle: 'Insira o arquivo CSV',
+                            onPressed: _uploadFile,
+                          ),
+                          const SizedBox(height: 20),
+                          if (csvData.isNotEmpty)
+                            ...csvData[0].map((e) {
+                              position = position! + 1;
+                              return FontSettings(
+                                position: position!,
+                                text: e.toString(),
+                                onColorPicked: (color) {
+                                  
+                                },
+                              );
+                            })
+                        ],
+                      ),
                     ),
-                  ),
-                  CertificateViewer(
-                    imageBytes: imageBytes,
-                    imageName: imageName,
-                    csvData: csvData,
-                  ),
-                ],
-              ),
-            )
-          ],
+                    CertificateViewer(
+                      imageBytes: imageBytes,
+                      imageName: imageName,
+                      csvData: csvData,
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -116,12 +132,12 @@ class _CertificateGenState extends State<CertificateGen> {
       PlatformFile file = result.files.first;
       Uint8List fileBytes = file.bytes!;
       String content = utf8.decode(fileBytes);
-      log(content);
 
       List<List<dynamic>> csvTable =
           const CsvToListConverter().convert(content);
       setState(() {
         csvData = csvTable;
+        position = 0;
       });
     }
   }
