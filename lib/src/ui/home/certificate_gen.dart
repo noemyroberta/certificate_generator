@@ -207,6 +207,7 @@ class _CertificateGenState extends State<CertificateGen> {
       }
     }
     setState(() {
+      selectedIndex = 0;
       selectedText = "#1 ${csv[0]!['value']}";
     });
   }
