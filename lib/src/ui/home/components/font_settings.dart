@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settins/input_increment_decrement.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_setting/input_increment_decrement.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 
