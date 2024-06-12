@@ -9,12 +9,15 @@ class DraggableText extends StatefulWidget {
     required this.text,
     this.fontSize,
     this.fontColor,
+    this.onPositionedText,
   }) : super(key: key);
 
   final String text;
   final double? fontSize;
   final Color? fontColor;
   final GlobalKey aereaKey;
+  final Function(Offset)? onPositionedText;
+  
 
   @override
   State<DraggableText> createState() => _DraggableTextState();
@@ -44,6 +47,7 @@ class _DraggableTextState extends State<DraggableText> {
               .globalToLocal(drag.offset);
           setState(() {
             _offset = localOffset;
+            widget.onPositionedText!(_offset);
           });
         },
         child: _buildDraggableText(),
@@ -67,7 +71,6 @@ class _DraggableTextState extends State<DraggableText> {
                 color: fontColor ?? Colors.black,
                 fontFamily: 'RobotoSlab',
                 fontWeight: FontWeight.normal,
-                fontStyle: FontStyle.italic,
                 fontSize: fontSize ?? 20,
               ),
               child: Text(text),

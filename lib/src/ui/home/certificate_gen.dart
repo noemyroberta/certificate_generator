@@ -1,17 +1,17 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:typed_data';
+// ignore_for_file: avoid_print
 
-import 'package:csv/csv.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/generator.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/strings.dart';
-
+import 'package:csv/csv.dart';
 import 'components/header.dart';
 
 class CertificateGen extends StatefulWidget {
@@ -25,9 +25,11 @@ class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
   GlobalKey aereaKey = GlobalKey();
-  Map<int, Map<String, dynamic>> csv = {};
+  Map<int, Map<String, dynamic>> csvHeaderSetting = {};
   String selectedText = '';
   int selectedIndex = 0;
+  List<List<dynamic>> csvRows = [];
+  Offset position = const Offset(0, 0);
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +85,7 @@ class _CertificateGenState extends State<CertificateGen> {
                             onPressed: _uploadFile,
                           ),
                           const SizedBox(height: 50),
-                          if (csv.isNotEmpty)
+                          if (csvHeaderSetting.isNotEmpty)
                             const Text(
                               'Selecione o texto para customizar',
                               style: TextStyle(
@@ -93,10 +95,10 @@ class _CertificateGenState extends State<CertificateGen> {
                                 fontSize: 14,
                               ),
                             ),
-                          if (csv.isNotEmpty)
+                          if (csvHeaderSetting.isNotEmpty)
                             DropdownButton<String>(
                               value: selectedText,
-                              items: csv.entries.map((entry) {
+                              items: csvHeaderSetting.entries.map((entry) {
                                 int index = entry.key;
                                 String text = entry.value['value'];
 
@@ -113,16 +115,18 @@ class _CertificateGenState extends State<CertificateGen> {
                                 });
                               },
                             ),
-                          if (csv.isNotEmpty)
+                          if (csvHeaderSetting.isNotEmpty)
                             FontSettings(
                               onFontSizeChanged: (newValue) {
                                 setState(() {
-                                  csv[selectedIndex]!['size'] = newValue;
+                                  csvHeaderSetting[selectedIndex]!['size'] =
+                                      newValue;
                                 });
                               },
                               onColorPicked: (newColor) {
                                 setState(() {
-                                  csv[selectedIndex]!['color'] = newColor;
+                                  csvHeaderSetting[selectedIndex]!['color'] =
+                                      newColor;
                                 });
                               },
                             ),
@@ -133,13 +137,24 @@ class _CertificateGenState extends State<CertificateGen> {
                       key: aereaKey,
                       imageBytes: imageBytes,
                       imageName: imageName,
-                      texts: csv.isNotEmpty
-                          ? csv.entries.map((entry) {
+                      onDownload: () async {
+                        final gen = Generator(
+                          csv: csvRows,
+                          position: position,
+                          background: imageBytes!,
+                        );
+                        await gen.createPDF();
+                      },
+                      texts: csvHeaderSetting.isNotEmpty
+                          ? csvHeaderSetting.entries.map((entry) {
                               int index = entry.key;
                               final value = entry.value;
 
                               return DraggableText(
                                 aereaKey: aereaKey,
+                                onPositionedText: (offset) {
+                                  position = offset;
+                                },
                                 fontSize: _getFontSizeByPos(index),
                                 fontColor: _getColorByPos(index),
                                 text: getWithNoSpaceAtTheEnd(value['value']),
@@ -159,7 +174,6 @@ class _CertificateGenState extends State<CertificateGen> {
 
   String getWithNoSpaceAtTheEnd(String text) {
     if (text.endsWith(' ')) {
-      log('yes');
       String value = text.substring(0, text.length - 1);
       return value;
     }
@@ -189,31 +203,35 @@ class _CertificateGenState extends State<CertificateGen> {
       PlatformFile file = result.files.first;
       Uint8List fileBytes = file.bytes!;
       String content = utf8.decode(fileBytes);
-
-      List<List<dynamic>> csvTable =
-          const CsvToListConverter().convert(content);
-      _initializeFontSettings(csvTable);
+      List<List<String>> rows = const CsvToListConverter(
+        shouldParseNumbers: false,
+        eol: "\n",
+      ).convert<String>(content, eol: "\n", shouldParseNumbers: false);
+      _initializeFontSettings(rows[0]);
     }
   }
 
-  void _initializeFontSettings(List<List<dynamic>> csvTable) {
-    if (csvTable.isNotEmpty) {
-      for (int i = 0; i < csvTable[0].length; i++) {
-        csv[i] = {
-          'value': csvTable[0][i].toString(),
-          'size': 20,
-          'color': Colors.black87,
-        };
-      }
+  void _initializeFontSettings(List<String> csvHeader) {
+    if (csvHeader.isEmpty) {
+      return;
     }
+
+    for (int i = 0; i < csvHeader.length; i++) {
+      csvHeaderSetting[i] = {
+        'value': csvHeader[i].toString(),
+        'size': 20,
+        'color': Colors.black87,
+      };
+    }
+
     setState(() {
       selectedIndex = 0;
-      selectedText = "#1 ${csv[0]!['value']}";
+      selectedText = "#1 ${csvHeaderSetting[0]!['value']}";
     });
   }
 
   double? _getFontSizeByPos(int position) {
-    for (final setting in csv.entries) {
+    for (final setting in csvHeaderSetting.entries) {
       if (setting.key == position) {
         return setting.value['size'];
       }
@@ -222,7 +240,7 @@ class _CertificateGenState extends State<CertificateGen> {
   }
 
   Color? _getColorByPos(int position) {
-    for (var element in csv.entries) {
+    for (var element in csvHeaderSetting.entries) {
       if (element.key == position) {
         return element.value['color'];
       }
