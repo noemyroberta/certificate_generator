@@ -23,11 +23,11 @@ class FontSettings extends StatefulWidget {
 }
 
 class _FontSettingsState extends State<FontSettings> {
-  late Color pickedColor;
+  late Color _pickedColor;
 
   void changeColor(Color color) {
     setState(() {
-      pickedColor = color;
+      _pickedColor = color;
     });
     widget.onColorPicked(color);
   }
@@ -38,9 +38,18 @@ class _FontSettingsState extends State<FontSettings> {
 
   @override
   void initState() {
-    pickedColor = primaryColor;
+    _pickedColor = primaryColor;
     super.initState();
   }
+
+  @override
+  void didUpdateWidget(covariant FontSettings oldWidget) {
+    if (oldWidget.pickedColor != widget.pickedColor) {
+      _pickedColor = widget.pickedColor;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +106,7 @@ class _FontSettingsState extends State<FontSettings> {
           title: const Text('Escolha a cor'),
           content: SingleChildScrollView(
             child: ColorPicker(
-              pickerColor: pickedColor,
+              pickerColor: _pickedColor,
               onColorChanged: changeColor,
             ),
           ),
