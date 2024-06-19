@@ -4,9 +4,10 @@ import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_widget.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_section.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
@@ -26,8 +27,7 @@ class _CertificateGenState extends State<CertificateGen> {
   String imageName = '';
   GlobalKey aereaKey = GlobalKey();
   Offset position = const Offset(0, 0);
-  String selectedText = '';
-  int selectedIndex = 0;
+  String initialText = "";
   Map<int, FontSettingsEntity> header = {};
   List<List<String>> rows = [];
 
@@ -85,51 +85,18 @@ class _CertificateGenState extends State<CertificateGen> {
                             onPressed: _uploadFile,
                           ),
                           const SizedBox(height: 50),
-                          if (header.isNotEmpty)
-                            const Text(
-                              'Selecione o texto para customizar',
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontFamily: 'RobotoSlab',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                              ),
-                            ),
-                          if (header.isNotEmpty)
-                            DropdownButton<String>(
-                              value: selectedText,
-                              items: header.entries.map((entry) {
-                                int index = entry.key;
-                                String text = entry.value.value;
-
-                                return DropdownMenuItem<String>(
-                                  value: '#${index + 1} $text',
-                                  child: Text('#${index + 1} $text'),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
+                          Visibility(
+                            visible: header.isNotEmpty,
+                            child: FontSettingsSection(
+                              initialText: initialText,
+                              header: header,
+                              onTextChanged: (text) {
                                 setState(() {
-                                  selectedText = newValue!;
-                                  selectedIndex =
-                                      int.parse(newValue.substring(1, 2)) - 1;
+                                  header.update(text.$1, (value) => text.$2);
                                 });
                               },
                             ),
-                          if (header.isNotEmpty)
-                            FontSettings(
-                              fontSize: header[selectedIndex]!.fontSize,
-                              pickedColor: header[selectedIndex]!.color,
-                              onFontSizeChanged: (newValue) {
-                                setState(() {
-                                  header[selectedIndex]!.fontSize = newValue;
-                                });
-                              },
-                              onColorPicked: (newColor) {
-                                setState(() {
-                                  header[selectedIndex]!.color = newColor;
-                                });
-                              },
-                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -218,7 +185,7 @@ class _CertificateGenState extends State<CertificateGen> {
     }
 
     setState(() {
-      selectedText = "#1 ${header[0]!.value}";
+      initialText = "#1 ${header[0]!.value}";
     });
   }
 
