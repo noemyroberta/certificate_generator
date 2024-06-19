@@ -32,6 +32,7 @@ class _FontSettingsSectionState extends State<FontSettingsSection> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Selecione o texto para customizar',
