@@ -8,16 +8,16 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 
 class Generator {
-  final List<List<dynamic>> csv;
+  final List<List<String>> csv;
   final Offset position;
-  //List<pw.TextStyle> styles;
+  final List<pw.TextStyle> styles;
   final Uint8List background;
 
   const Generator({
     required this.csv,
     required this.position,
     required this.background,
-    //this.styles,
+    this.styles = const [],
   });
 
   Future<List<pw.Text>> _getTextWithStyle() async {
