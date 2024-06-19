@@ -77,6 +77,7 @@ class _FontSettingsState extends State<FontSettings> {
                   ),
                 ),
                 InputIncrementDecrement(
+                  initialValue: widget.fontSize,
                   onValueChanged: changeSize,
                 ),
               ],

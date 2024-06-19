@@ -4,8 +4,10 @@ class InputIncrementDecrement extends StatefulWidget {
   const InputIncrementDecrement({
     super.key,
     required this.onValueChanged,
+    required this.initialValue,
   });
   final ValueChanged<int> onValueChanged;
+  final int initialValue;
 
   @override
   State<InputIncrementDecrement> createState() =>
@@ -18,11 +20,19 @@ class _InputIncrementDecrementState extends State<InputIncrementDecrement> {
   @override
   void initState() {
     super.initState();
-    _controller.text = '20';
+    _controller.text = widget.initialValue.toString();
   }
 
   void changeValue(int value) {
     widget.onValueChanged(value);
+  }
+
+  @override
+  void didUpdateWidget(covariant InputIncrementDecrement oldWidget) {
+    if (oldWidget.initialValue != widget.initialValue) {
+      _controller.text = widget.initialValue.toString();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
