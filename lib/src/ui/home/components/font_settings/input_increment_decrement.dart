@@ -1,15 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 class InputIncrementDecrement extends StatefulWidget {
   const InputIncrementDecrement({
     super.key,
-    required this.initialValue,
     required this.onValueChanged,
   });
-  final String initialValue;
-  final void Function(int)? onValueChanged;
+  final ValueChanged<int> onValueChanged;
 
   @override
   State<InputIncrementDecrement> createState() =>
@@ -22,13 +18,11 @@ class _InputIncrementDecrementState extends State<InputIncrementDecrement> {
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.initialValue;
+    _controller.text = '20';
   }
 
   void changeValue(int value) {
-    if (widget.onValueChanged != null) {
-      widget.onValueChanged!(value);
-    }
+    widget.onValueChanged(value);
   }
 
   @override
@@ -65,7 +59,9 @@ class _InputIncrementDecrementState extends State<InputIncrementDecrement> {
                   ),
                   controller: _controller,
                   keyboardType: const TextInputType.numberWithOptions(
-                      decimal: false, signed: true),
+                    decimal: false,
+                    signed: true,
+                  ),
                 ),
               ),
               SizedBox(
@@ -101,7 +97,6 @@ class _InputIncrementDecrementState extends State<InputIncrementDecrement> {
                       onTap: () {
                         int currentValue = int.parse(_controller.text);
                         setState(() {
-                          log("Setting state");
                           currentValue--;
                           _controller.text =
                               (currentValue > 0 ? currentValue : 0).toString();

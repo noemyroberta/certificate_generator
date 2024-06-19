@@ -13,11 +13,10 @@ class DraggableText extends StatefulWidget {
   }) : super(key: key);
 
   final String text;
-  final double? fontSize;
+  final int? fontSize;
   final Color? fontColor;
   final GlobalKey aereaKey;
   final Function(Offset)? onPositionedText;
-  
 
   @override
   State<DraggableText> createState() => _DraggableTextState();
@@ -26,7 +25,7 @@ class DraggableText extends StatefulWidget {
 class _DraggableTextState extends State<DraggableText> {
   GlobalKey get aereaKey => widget.aereaKey;
   String get text => widget.text;
-  double? get fontSize => widget.fontSize;
+  int? get fontSize => widget.fontSize;
   Color? get fontColor => widget.fontColor;
   Offset _offset = const Offset(0, 0);
 
@@ -71,7 +70,7 @@ class _DraggableTextState extends State<DraggableText> {
                 color: fontColor ?? Colors.black,
                 fontFamily: 'RobotoSlab',
                 fontWeight: FontWeight.normal,
-                fontSize: fontSize ?? 20,
+                fontSize: fontSize != null ? fontSize as double : 20,
               ),
               child: Text(text),
             ),

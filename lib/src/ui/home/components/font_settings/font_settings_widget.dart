@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_setting/input_increment_decrement.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/input_increment_decrement.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 
 class FontSettings extends StatefulWidget {
   const FontSettings({
     super.key,
-    this.onColorPicked,
-    this.onFontSizeChanged,
+    required this.onColorPicked,
+    required this.onFontSizeChanged,
+    required this.fontSize,
+    required this.pickedColor,
   });
 
-  final Function(Color)? onColorPicked;
-  final Function(int)? onFontSizeChanged;
+  final ValueChanged<Color> onColorPicked;
+  final int fontSize;
+  final Color pickedColor;
+  final ValueChanged<int> onFontSizeChanged;
 
   @override
   State<FontSettings> createState() => _FontSettingsState();
@@ -22,20 +26,14 @@ class _FontSettingsState extends State<FontSettings> {
   late Color pickedColor;
 
   void changeColor(Color color) {
-    if (widget.onColorPicked != null) {
-      setState(() {
-        pickedColor = color;
-        widget.onColorPicked!(color);
-      });
-    }
+    setState(() {
+      pickedColor = color;
+    });
+    widget.onColorPicked(color);
   }
 
   void changeSize(int size) {
-    if (widget.onFontSizeChanged != null) {
-      setState(() {
-        widget.onFontSizeChanged!(size);
-      });
-    }
+    widget.onFontSizeChanged(size);
   }
 
   @override
@@ -79,7 +77,6 @@ class _FontSettingsState extends State<FontSettings> {
                   ),
                 ),
                 InputIncrementDecrement(
-                  initialValue: "20",
                   onValueChanged: changeSize,
                 ),
               ],
