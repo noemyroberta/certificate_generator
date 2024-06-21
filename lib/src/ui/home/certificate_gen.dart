@@ -110,7 +110,8 @@ class _CertificateGenState extends State<CertificateGen> {
                           background: imageBytes!,
                           settings: header.values.toList(),
                         );
-                        await gen.createPDF();
+                        await gen.create();
+                        gen.download();
                       },
                       texts: header.isNotEmpty
                           ? header.entries.map((entry) {

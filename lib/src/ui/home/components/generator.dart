@@ -42,7 +42,7 @@ class Generator {
     return texts;
   }
 
-  createPDF() async {
+  create() async {
     for (int i = 0; i < csv.length; i++) {
       final pdf = pw.Document();
       final image = pw.MemoryImage(background);
@@ -71,7 +71,7 @@ class Generator {
     }
   }
 
-  Future<void> downloadAll() async {
+  Future<void> download() async {
     if (pdfs.isEmpty) {
       log("PDFs not generated yet.");
       return;
