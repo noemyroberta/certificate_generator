@@ -4,23 +4,27 @@ import 'dart:developer';
 import 'dart:html' as html;
 
 import 'package:archive/archive.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
 
-class Generator {
+class Generator extends ChangeNotifier {
   final List<List<String>> csv;
   final List<FontSettingsEntity> settings;
   final Uint8List background;
   final List<pw.Document> pdfs;
+  bool _downloading = false;
 
   Generator({
     required this.csv,
     required this.background,
     this.settings = const [],
   }) : pdfs = [];
+
+  bool get downloading => _downloading;
 
   Future<List<pw.Text>> _getColumnTexts(int rowIndex) async {
     final List<pw.Text> texts = [];
@@ -85,12 +89,18 @@ class Generator {
       final fileName = "${DateTime.now().millisecondsSinceEpoch}_$i.pdf";
       archive.addFile(ArchiveFile(fileName, savedFile.length, savedFile));
     }
-
+    _setDownloadState(true);
     final zipEncoder = ZipEncoder();
     final zipData = zipEncoder.encode(archive);
     final base64ZipData = base64Encode(zipData!);
     html.AnchorElement(href: "data:application/zip;base64,$base64ZipData")
       ..setAttribute("download", "certificados.zip")
       ..click();
+    _setDownloadState(false);
+  }
+
+  _setDownloadState(bool state) {
+    _downloading = state;
+    notifyListeners();
   }
 }
