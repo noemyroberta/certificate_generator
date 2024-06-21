@@ -113,8 +113,9 @@ class _CertificateGenState extends State<CertificateGen> {
                         await gen.create();
                         gen.download();
                       },
-                      texts: header.isNotEmpty
-                          ? header.entries.map((entry) {
+                      texts: header.isEmpty
+                          ? []
+                          : header.entries.map((entry) {
                               int index = entry.key;
                               final setting = entry.value;
 
@@ -129,8 +130,7 @@ class _CertificateGenState extends State<CertificateGen> {
                                 fontColor: _getColorByPos(index),
                                 text: getWithNoSpaceAtTheEnd(setting.value),
                               );
-                            }).toList()
-                          : [],
+                            }).toList(),
                     ),
                   ],
                 ),
