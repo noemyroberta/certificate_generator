@@ -69,10 +69,10 @@ class _CertificateViewerState extends State<CertificateViewer> {
             alignment: Alignment.centerRight,
             child: ElevatedButton.icon(
               style: ButtonStyle(
-                foregroundColor: MaterialStateColor.resolveWith(
+                foregroundColor: WidgetStateColor.resolveWith(
                   (states) => primaryColor,
                 ),
-                backgroundColor: MaterialStateColor.resolveWith(
+                backgroundColor: WidgetStateColor.resolveWith(
                   (states) => primaryColor,
                 ),
               ),

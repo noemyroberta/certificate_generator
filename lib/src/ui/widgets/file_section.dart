@@ -58,8 +58,8 @@ class FileSection extends StatelessWidget {
             ElevatedButton.icon(
               style: ButtonStyle(
                 foregroundColor:
-                    MaterialStateColor.resolveWith((states) => primaryColor),
-                backgroundColor: MaterialStateColor.resolveWith(
+                    WidgetStateColor.resolveWith((states) => primaryColor),
+                backgroundColor: WidgetStateColor.resolveWith(
                     (states) => buttonBackgroundColor ?? primaryColor),
               ),
               onPressed: onPressed,

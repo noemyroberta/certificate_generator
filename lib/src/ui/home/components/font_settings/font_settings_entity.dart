@@ -5,13 +5,16 @@ class FontSettingsEntity {
   String value;
   int fontSize;
   Color color;
+  Offset? position;
 
   FontSettingsEntity(
     this.value, {
     this.fontSize = 20,
     this.color = Colors.black,
+    this.position,
   });
 
   @override
-  String toString() => 'FontSettingsEntity(value: $value, fontSize: $fontSize, color: $color)';
+  String toString() => 'FontSettingsEntity(value: $value, fontSize: $fontSize,' 
+          'color: $color, position: $position)';
 }

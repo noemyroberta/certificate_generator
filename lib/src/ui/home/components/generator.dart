@@ -1,80 +1,82 @@
-import 'dart:developer';
-import 'dart:io';
+import 'dart:convert';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
-import 'package:archive/archive_io.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
+import 'package:printing/printing.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
 
 class Generator {
   final List<List<String>> csv;
-  final Offset position;
-  final List<pw.TextStyle> styles;
+  final List<FontSettingsEntity> settings;
   final Uint8List background;
 
-  const Generator({
+  Generator({
     required this.csv,
-    required this.position,
     required this.background,
-    this.styles = const [],
+    this.settings = const [],
   });
 
-  Future<List<pw.Text>> _getTextWithStyle() async {
+  Future<List<pw.Text>> _getColumnTexts(int rowIndex) async {
     final List<pw.Text> texts = [];
-    final font = await rootBundle.load("assets/RobotoSlab-ExtraBold.ttf");
+    final font = await PdfGoogleFonts.robotoBold();
 
-    for (int j = 0; j < csv.length; j++) {
-      for (int i = 0; i < csv[j].length; i++) {
-        log(csv[j][i]);
-        texts.add(
-          pw.Text(
-            csv[j][i].toString(),
-            style: pw.TextStyle(
-              font: pw.Font.ttf(font),
-              color: PdfColor.fromInt(primaryColor.value),
-              fontSize: 20,
-            ),
+    for (int i = 0; i < csv[rowIndex].length; i++) {
+      texts.add(
+        pw.Text(
+          csv[rowIndex][i].toString(),
+          style: pw.TextStyle(
+            font: font,
+            color: PdfColor.fromInt(settings[i].color.value),
+            fontSize: settings[i].fontSize.toDouble(),
           ),
-        );
-      }
+        ),
+      );
     }
+
     return texts;
   }
 
   createPDF() async {
-    final pdf = pw.Document();
-    final image = pw.MemoryImage(background);
-    final texts = await _getTextWithStyle();
-    final encoder = ZipFileEncoder();
-    encoder.create('certificates.zip');
-
+    final pdfs = [];
     for (int i = 0; i < csv.length; i++) {
+      final pdf = pw.Document();
+      final image = pw.MemoryImage(background);
+      final texts = await _getColumnTexts(i);
+
       pdf.addPage(
         pw.Page(
+          pageFormat: PdfPageFormat.a4.landscape,
+          orientation: pw.PageOrientation.landscape,
           build: (pw.Context context) {
             return pw.Stack(
               children: [
                 pw.Image(image),
-                ...texts.map(
-                  (text) {
-                    return pw.Positioned(
-                      left: position.dx,
-                      top: position.dy,
-                      child: text,
-                    );
-                  },
-                ),
+                for (int j = 0; j < texts.length; j++)
+                  pw.Positioned(
+                    left: settings[j].position!.dx,
+                    top: settings[j].position!.dy,
+                    child: texts[j],
+                  ),
               ],
             );
           },
         ),
       );
-      File file = File('${i + 1}.pdf');
-      await file.writeAsBytes(await pdf.save());
-      encoder.addFile(file);
+      pdfs.add(pdf);
     }
 
-    encoder.close();
+    for (pw.Document pdf in pdfs) {
+      var savedFile = await pdf.save();
+      List<int> fileInts = List.from(savedFile);
+      html.AnchorElement(
+          href:
+              "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
+        ..setAttribute(
+            "download", "${DateTime.now().millisecondsSinceEpoch}.pdf")
+        ..click();
+    }
   }
 }

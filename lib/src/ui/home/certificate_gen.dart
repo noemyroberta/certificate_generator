@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_section.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/generator.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
@@ -104,7 +104,14 @@ class _CertificateGenState extends State<CertificateGen> {
                       key: aereaKey,
                       imageBytes: imageBytes,
                       imageName: imageName,
-                      onDownload: () async {},
+                      onDownload: () async {
+                        final gen = Generator(
+                          csv: rows,
+                          background: imageBytes!,
+                          settings: header.values.toList(),
+                        );
+                        await gen.createPDF();
+                      },
                       texts: header.isNotEmpty
                           ? header.entries.map((entry) {
                               int index = entry.key;
@@ -114,6 +121,8 @@ class _CertificateGenState extends State<CertificateGen> {
                                 aereaKey: aereaKey,
                                 onPositionedText: (offset) {
                                   position = offset;
+                                  header.values.elementAt(index).position =
+                                      offset;
                                 },
                                 fontSize: _getFontSizeByPos(index),
                                 fontColor: _getColorByPos(index),
@@ -163,7 +172,7 @@ class _CertificateGenState extends State<CertificateGen> {
       PlatformFile file = result.files.first;
       Uint8List fileBytes = file.bytes!;
       String content = utf8.decode(fileBytes);
-      List<List<String>> rows = const CsvToListConverter(
+      rows = const CsvToListConverter(
         shouldParseNumbers: false,
         eol: "\n",
       ).convert<String>(content, eol: "\n", shouldParseNumbers: false);
