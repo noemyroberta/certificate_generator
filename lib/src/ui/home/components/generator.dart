@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
+import 'package:archive/archive.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -12,12 +14,13 @@ class Generator {
   final List<List<String>> csv;
   final List<FontSettingsEntity> settings;
   final Uint8List background;
+  final List<pw.Document> pdfs;
 
   Generator({
     required this.csv,
     required this.background,
     this.settings = const [],
-  });
+  }) : pdfs = [];
 
   Future<List<pw.Text>> _getColumnTexts(int rowIndex) async {
     final List<pw.Text> texts = [];
@@ -40,7 +43,6 @@ class Generator {
   }
 
   createPDF() async {
-    final pdfs = [];
     for (int i = 0; i < csv.length; i++) {
       final pdf = pw.Document();
       final image = pw.MemoryImage(background);
@@ -67,16 +69,28 @@ class Generator {
       );
       pdfs.add(pdf);
     }
+  }
 
-    for (pw.Document pdf in pdfs) {
-      var savedFile = await pdf.save();
-      List<int> fileInts = List.from(savedFile);
-      html.AnchorElement(
-          href:
-              "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
-        ..setAttribute(
-            "download", "${DateTime.now().millisecondsSinceEpoch}.pdf")
-        ..click();
+  Future<void> downloadAll() async {
+    if (pdfs.isEmpty) {
+      log("PDFs not generated yet.");
+      return;
     }
+
+    final archive = Archive();
+
+    for (int i = 0; i < pdfs.length; i++) {
+      final pdf = pdfs[i];
+      final savedFile = await pdf.save();
+      final fileName = "${DateTime.now().millisecondsSinceEpoch}_$i.pdf";
+      archive.addFile(ArchiveFile(fileName, savedFile.length, savedFile));
+    }
+
+    final zipEncoder = ZipEncoder();
+    final zipData = zipEncoder.encode(archive);
+    final base64ZipData = base64Encode(zipData!);
+    html.AnchorElement(href: "data:application/zip;base64,$base64ZipData")
+      ..setAttribute("download", "certificados.zip")
+      ..click();
   }
 }
