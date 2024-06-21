@@ -14,13 +14,13 @@ import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font
 class Generator extends ChangeNotifier {
   final List<List<String>> csv;
   final List<FontSettingsEntity> settings;
-  final Uint8List background;
+  final Uint8List? background;
   final List<pw.Document> pdfs;
   bool _downloading = false;
 
   Generator({
-    required this.csv,
-    required this.background,
+    this.csv = const [],
+    this.background,
     this.settings = const [],
   }) : pdfs = [];
 
@@ -49,7 +49,7 @@ class Generator extends ChangeNotifier {
   create() async {
     for (int i = 0; i < csv.length; i++) {
       final pdf = pw.Document();
-      final image = pw.MemoryImage(background);
+      final image = pw.MemoryImage(background!);
       final texts = await _getColumnTexts(i);
 
       pdf.addPage(
