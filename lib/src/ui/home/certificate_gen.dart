@@ -106,12 +106,12 @@ class _CertificateGenState extends State<CertificateGen> {
                       imageName: imageName,
                       onDownload: () async {
                         final gen = Generator(
+                          context: context,
                           csv: rows,
                           background: imageBytes!,
                           settings: header.values.toList(),
                         );
                         await gen.create();
-                        gen.download();
                       },
                       texts: header.isEmpty
                           ? []
