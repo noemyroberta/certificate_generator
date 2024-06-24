@@ -7,7 +7,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     ChangeNotifierProvider(
-      create: (_) => Generator(),
+      create: (_) => GeneratorState(),
       child: const CertificateGen(),
     ),
   );
