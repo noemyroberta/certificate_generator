@@ -67,43 +67,41 @@ class _CertificateViewerState extends State<CertificateViewer> {
             ),
           ),
           const SizedBox(height: 10),
-          Consumer<Generator>(
-            builder: (context, generator, child) {
-              if (generator.downloading) {
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: CircularProgressIndicator(color: primaryColor),
-                );
-              }
-              return Align(
+          Consumer<GeneratorState>(builder: (_, state, child) {
+            if (state.downloading) {
+              return const Align(
                 alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  style: ButtonStyle(
-                    foregroundColor: WidgetStateColor.resolveWith(
-                      (states) => primaryColor,
-                    ),
-                    backgroundColor: WidgetStateColor.resolveWith(
-                      (states) => primaryColor,
-                    ),
+                child: CircularProgressIndicator(color: primaryColor),
+              );
+            }
+            return Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                style: ButtonStyle(
+                  foregroundColor: WidgetStateColor.resolveWith(
+                    (states) => primaryColor,
                   ),
-                  onPressed: widget.onDownload,
-                  icon: const Icon(
-                    Icons.download_outlined,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Baixar certificados',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'RobotoSlab',
-                      fontWeight: FontWeight.normal,
-                      fontSize: 14,
-                    ),
+                  backgroundColor: WidgetStateColor.resolveWith(
+                    (states) => primaryColor,
                   ),
                 ),
-              );
-            },
-          ),
+                onPressed: widget.onDownload,
+                icon: const Icon(
+                  Icons.download_outlined,
+                  color: Colors.white,
+                ),
+                label: const Text(
+                  'Baixar certificados',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'RobotoSlab',
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
