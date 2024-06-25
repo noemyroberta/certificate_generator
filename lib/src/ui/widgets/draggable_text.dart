@@ -6,6 +6,7 @@ class DraggableText extends StatefulWidget {
   const DraggableText({
     Key? key,
     required this.aereaKey,
+    required this.imageKey,
     required this.text,
     this.fontSize,
     this.fontColor,
@@ -15,7 +16,7 @@ class DraggableText extends StatefulWidget {
   final String text;
   final int? fontSize;
   final Color? fontColor;
-  final GlobalKey aereaKey;
+  final GlobalKey aereaKey, imageKey;
   final Function(Offset)? onPositionedText;
 
   @override
@@ -24,10 +25,12 @@ class DraggableText extends StatefulWidget {
 
 class _DraggableTextState extends State<DraggableText> {
   GlobalKey get aereaKey => widget.aereaKey;
+  GlobalKey get imageKey => widget.imageKey;
   String get text => widget.text;
   int? get fontSize => widget.fontSize;
   Color? get fontColor => widget.fontColor;
   Offset _offset = const Offset(0, 0);
+  Offset _realOffset = const Offset(0, 0);
 
   @override
   Widget build(BuildContext context) {
@@ -39,19 +42,24 @@ class _DraggableTextState extends State<DraggableText> {
         feedback: _buildDraggableText(),
         childWhenDragging: _buildDraggableText(),
         onDragEnd: (drag) {
-          RenderBox? renderBox = aereaKey //
-              .currentContext! //
-              .findRenderObject() as RenderBox;
-          final localOffset = renderBox //
-              .globalToLocal(drag.offset);
+          Offset viewer = _getLocalPosition(drag, aereaKey);
+          Offset image = _getLocalPosition(drag, imageKey);
+          Offset diff = Offset(viewer.dx - image.dx, viewer.dy - image.dy);
+          _realOffset = Offset(viewer.dx - diff.dx, viewer.dy - diff.dy);
+
           setState(() {
-            _offset = localOffset;
-            widget.onPositionedText!(_offset);
+            _offset = viewer;
+            widget.onPositionedText!(_realOffset);
           });
         },
         child: _buildDraggableText(),
       ),
     );
+  }
+
+  Offset _getLocalPosition(DraggableDetails draggable, GlobalKey key) {
+    RenderBox? box = key.currentContext!.findRenderObject() as RenderBox;
+    return box.globalToLocal(draggable.offset);
   }
 
   Widget _buildDraggableText() {

@@ -15,12 +15,14 @@ class CertificateViewer extends StatefulWidget {
     required this.imageName,
     required this.texts,
     required this.onDownload,
+    required this.imageKey,
   }) : super(key: key);
 
   final Uint8List? imageBytes;
   final String? imageName;
   final List<DraggableText> texts;
   final Function()? onDownload;
+  final ValueSetter<GlobalKey> imageKey;
 
   @override
   State<CertificateViewer> createState() => _CertificateViewerState();
@@ -28,6 +30,13 @@ class CertificateViewer extends StatefulWidget {
 
 class _CertificateViewerState extends State<CertificateViewer> {
   List<DraggableText> get texts => widget.texts;
+  GlobalKey imageKey = GlobalKey();
+
+  @override
+  void initState() {
+    widget.imageKey(imageKey);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +54,7 @@ class _CertificateViewerState extends State<CertificateViewer> {
                   widget.imageBytes != null
                       ? Center(
                           child: Image.memory(
+                            key: imageKey,
                             widget.imageBytes!,
                             filterQuality: FilterQuality.high,
                           ),

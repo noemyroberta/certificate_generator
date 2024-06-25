@@ -25,7 +25,8 @@ class CertificateGen extends StatefulWidget {
 class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
-  GlobalKey aereaKey = GlobalKey();
+  GlobalKey? imageKey;
+  GlobalKey viewerKey = GlobalKey();
   Offset position = const Offset(0, 0);
   String initialText = "";
   Map<int, FontSettingsEntity> header = {};
@@ -101,7 +102,8 @@ class _CertificateGenState extends State<CertificateGen> {
                       ),
                     ),
                     CertificateViewer(
-                      key: aereaKey,
+                      key: viewerKey,
+                      imageKey: (key) => imageKey = key,
                       imageBytes: imageBytes,
                       imageName: imageName,
                       onDownload: () async {
@@ -120,7 +122,8 @@ class _CertificateGenState extends State<CertificateGen> {
                               final setting = entry.value;
 
                               return DraggableText(
-                                aereaKey: aereaKey,
+                                imageKey: imageKey!,
+                                aereaKey: viewerKey,
                                 onPositionedText: (offset) {
                                   position = offset;
                                   header.values.elementAt(index).position =
