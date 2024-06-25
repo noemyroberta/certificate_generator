@@ -78,12 +78,6 @@ class _CertificateViewerState extends State<CertificateViewer> {
           ),
           const SizedBox(height: 10),
           Consumer<GeneratorState>(builder: (_, state, child) {
-            if (state.downloading) {
-              return const Align(
-                alignment: Alignment.centerRight,
-                child: CircularProgressIndicator(color: primaryColor),
-              );
-            }
             return Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton.icon(
@@ -96,13 +90,13 @@ class _CertificateViewerState extends State<CertificateViewer> {
                   ),
                 ),
                 onPressed: widget.onDownload,
-                icon: const Icon(
-                  Icons.download_outlined,
+                icon: Icon(
+                  state.downloading ? null : Icons.download_outlined,
                   color: Colors.white,
                 ),
-                label: const Text(
-                  'Baixar certificados',
-                  style: TextStyle(
+                label: Text(
+                  state.downloading ? "Carregando..." : "Baixar certificados",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontFamily: 'RobotoSlab',
                     fontWeight: FontWeight.normal,
