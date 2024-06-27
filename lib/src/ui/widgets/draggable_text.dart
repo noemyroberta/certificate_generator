@@ -8,6 +8,7 @@ class DraggableText extends StatefulWidget {
     required this.aereaKey,
     required this.imageKey,
     required this.text,
+    required this.currentPosition,
     this.fontSize,
     this.fontColor,
     this.onPositionedText,
@@ -17,6 +18,7 @@ class DraggableText extends StatefulWidget {
   final int? fontSize;
   final Color? fontColor;
   final GlobalKey aereaKey, imageKey;
+  final Offset currentPosition;
   final Function(Offset)? onPositionedText;
 
   @override

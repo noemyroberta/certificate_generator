@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_widget.dart';
@@ -5,12 +7,12 @@ import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font
 class FontSettingsSection extends StatefulWidget {
   const FontSettingsSection({
     super.key,
-    required this.header,
+    required this.selectedViewer,
     required this.initialText,
     required this.onTextChanged,
   });
 
-  final Map<int, FontSettingsEntity> header;
+  final List<FontSettingsEntity> selectedViewer;
   final String initialText;
   final ValueChanged<(int, FontSettingsEntity)> onTextChanged;
 
@@ -19,8 +21,8 @@ class FontSettingsSection extends StatefulWidget {
 }
 
 class _FontSettingsSectionState extends State<FontSettingsSection> {
-  Map<int, FontSettingsEntity> get header => widget.header;
-  String selectedText = '';
+  List<FontSettingsEntity> get selectedViewer => widget.selectedViewer;
+  String selectedText = "";
   int selectedIndex = 0;
 
   @override
@@ -45,15 +47,7 @@ class _FontSettingsSectionState extends State<FontSettingsSection> {
         ),
         DropdownButton<String>(
           value: selectedText,
-          items: header.entries.map((entry) {
-            int index = entry.key;
-            String text = entry.value.value;
-
-            return DropdownMenuItem<String>(
-              value: '#${index + 1} $text',
-              child: Text('#${index + 1} $text'),
-            );
-          }).toList(),
+          items: _getItems(),
           onChanged: (String? newValue) {
             setState(() {
               selectedText = newValue!;
@@ -62,22 +56,37 @@ class _FontSettingsSectionState extends State<FontSettingsSection> {
           },
         ),
         FontSettings(
-          fontSize: header[selectedIndex]!.fontSize,
-          pickedColor: header[selectedIndex]!.color,
+          fontSize: selectedViewer[selectedIndex].fontSize,
+          pickedColor: selectedViewer[selectedIndex].color,
           onFontSizeChanged: (newValue) {
             setState(() {
-              header[selectedIndex]!.fontSize = newValue;
-              widget.onTextChanged((selectedIndex, header[selectedIndex]!));
+              selectedViewer[selectedIndex].fontSize = newValue;
+              widget.onTextChanged(
+                  (selectedIndex, selectedViewer[selectedIndex]));
             });
           },
           onColorPicked: (newColor) {
             setState(() {
-              header[selectedIndex]!.color = newColor;
-              widget.onTextChanged((selectedIndex, header[selectedIndex]!));
+              selectedViewer[selectedIndex].color = newColor;
+              widget.onTextChanged(
+                  (selectedIndex, selectedViewer[selectedIndex]));
             });
           },
         ),
       ],
     );
   }
+
+  List<DropdownMenuItem<String>> _getItems() {
+    List<DropdownMenuItem<String>> items = [];
+
+    for (int i = 0; i < selectedViewer.length; i++) {
+      items.add(DropdownMenuItem<String>(
+        value: '#${i + 1} ${selectedViewer[i].value}',
+        child: Text('#${i + 1} ${selectedViewer[i].value}'),
+      ));
+    }
+    return items;
+  }
+  
 }

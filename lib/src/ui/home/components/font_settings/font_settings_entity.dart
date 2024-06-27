@@ -1,18 +1,26 @@
 import "dart:convert";
+
 import "package:flutter/material.dart";
 
 class FontSettingsEntity {
   String value;
   int fontSize;
   Color color;
-  Offset? position;
+  Offset position;
 
   FontSettingsEntity(
     this.value, {
     this.fontSize = 20,
     this.color = Colors.black,
-    this.position,
+    this.position = const Offset(0,0),
   });
+
+  void update(FontSettingsEntity newEntity) {
+    value = newEntity.value;
+    fontSize = newEntity.fontSize;
+    color = newEntity.color;
+    position = newEntity.position;
+  }
 
   @override
   String toString() => "FontSettingsEntity(value: $value, fontSize: $fontSize,"
@@ -23,7 +31,7 @@ class FontSettingsEntity {
       "value": value,
       "fontSize": fontSize,
       "color": color.value,
-      "position": {"dx": position?.dx, "dy": position?.dy},
+      "position": {"dx": position.dx, "dy": position.dy},
     };
   }
 

@@ -9,15 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:provider/provider.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
 
 class GeneratorState extends ChangeNotifier {
   bool _downloading = false;
   bool get downloading => _downloading;
 
-  change(bool state) {
-    _downloading = state;
+  change() {
+    _downloading = !_downloading;
     notifyListeners();
   }
 }
@@ -42,8 +41,7 @@ class Generator {
         _archive = Archive();
 
   Future<void> create() async {
-    Provider.of<GeneratorState>(context, listen: false).change(true);
-    createPDFs();
+    _createPDFs();
 
     _memoryPdfs.stream.listen((pw.Document pdf) async {
       log("Listening _memoryPdfs");
@@ -70,7 +68,7 @@ class Generator {
     });
   }
 
-  createPDFs() async {
+  _createPDFs() async {
     final font = await PdfGoogleFonts.robotoSlabBold();
 
     for (int i = 0; i < csv.length; i++) {
@@ -113,8 +111,8 @@ class Generator {
               pw.Image(image),
               for (int j = 0; j < texts.length; j++)
                 pw.Positioned(
-                  left: settings[j].position!.dx,
-                  top: settings[j].position!.dy,
+                  left: settings[j].position.dx,
+                  top: settings[j].position.dy,
                   child: texts[j],
                 ),
             ],
@@ -127,10 +125,6 @@ class Generator {
   }
 
   Future<void> _download() async {
-    if (context.mounted) {
-      Provider.of<GeneratorState>(context, listen: false).change(false);
-    }
-
     final zipEncoder = ZipEncoder();
     final zipData = zipEncoder.encode(_archive);
     final base64ZipData = base64Encode(zipData!);

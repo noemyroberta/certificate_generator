@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_section.dart';
@@ -27,9 +28,10 @@ class _CertificateGenState extends State<CertificateGen> {
   String imageName = '';
   GlobalKey? imageKey;
   GlobalKey viewerKey = GlobalKey();
-  Offset position = const Offset(0, 0);
   String initialText = "";
-  Map<int, FontSettingsEntity> header = {};
+  int selectedViewerIndex = 0;
+  List<FontSettingsEntity> selectedViewer = [];
+  List<List<FontSettingsEntity>> certificateViewer = [];
   List<List<String>> rows = [];
 
   @override
@@ -87,13 +89,19 @@ class _CertificateGenState extends State<CertificateGen> {
                           ),
                           const SizedBox(height: 50),
                           Visibility(
-                            visible: header.isNotEmpty,
+                            visible: selectedViewer.isNotEmpty,
                             child: FontSettingsSection(
                               initialText: initialText,
-                              header: header,
+                              selectedViewer: selectedViewer,
                               onTextChanged: (text) {
                                 setState(() {
-                                  header.update(text.$1, (value) => text.$2);
+                                  selectedViewer
+                                      .elementAt(text.$1)
+                                      .update(text.$2);
+                                  certificateViewer
+                                      .elementAt(selectedViewerIndex)
+                                      .elementAt(text.$1)
+                                      .update(text.$2);
                                 });
                               },
                             ),
@@ -101,39 +109,31 @@ class _CertificateGenState extends State<CertificateGen> {
                         ],
                       ),
                     ),
+                    ..._getPreviewers(),
                     CertificateViewer(
                       key: viewerKey,
                       imageKey: (key) => imageKey = key,
                       imageBytes: imageBytes,
                       imageName: imageName,
                       onDownload: () async {
+                        if (context.mounted) {
+                          Provider.of<GeneratorState>(context, listen: false)
+                              .change();
+                        }
                         final gen = Generator(
                           context: context,
                           csv: rows,
                           background: imageBytes!,
-                          settings: header.values.toList(),
+                          settings: selectedViewer,
                         );
-                        await gen.create();
-                      },
-                      texts: header.isEmpty
-                          ? []
-                          : header.entries.map((entry) {
-                              int index = entry.key;
-                              final setting = entry.value;
 
-                              return DraggableText(
-                                imageKey: imageKey!,
-                                aereaKey: viewerKey,
-                                onPositionedText: (offset) {
-                                  position = offset;
-                                  header.values.elementAt(index).position =
-                                      offset;
-                                },
-                                fontSize: _getFontSizeByPos(index),
-                                fontColor: _getColorByPos(index),
-                                text: getWithNoSpaceAtTheEnd(setting.value),
-                              );
-                            }).toList(),
+                        await gen.create();
+                        if (context.mounted) {
+                          Provider.of<GeneratorState>(context, listen: false)
+                              .change();
+                        }
+                      },
+                      texts: _getDraggablesText(),
                     ),
                   ],
                 ),
@@ -180,43 +180,105 @@ class _CertificateGenState extends State<CertificateGen> {
         shouldParseNumbers: false,
         eol: "\n",
       ).convert<String>(content, eol: "\n", shouldParseNumbers: false);
-      _initializeFontSettings(rows[0]);
+      _initializeFontSettings(rows);
     }
   }
 
-  void _initializeFontSettings(List<String> csvHeader) {
-    if (csvHeader.isEmpty) {
+  void _initializeFontSettings(List<List<String>> csv) {
+    if (csv.isEmpty) {
       return;
     }
 
-    for (int i = 0; i < csvHeader.length; i++) {
-      header[i] = FontSettingsEntity(
-        csvHeader[i],
-        fontSize: 20,
-        color: Colors.black87,
-      );
+    for (int i = 0; i < csv.length; i++) {
+      certificateViewer.insert(i, []);
+      for (int j = 0; j < csv[i].length; j++) {
+        certificateViewer[i].add(
+          FontSettingsEntity(
+            csv[i][j],
+            fontSize: 20,
+            color: Colors.black87,
+          ),
+        );
+      }
     }
 
+    selectedViewer = certificateViewer[0];
     setState(() {
-      initialText = "#1 ${header[0]!.value}";
+      initialText = "#1 ${selectedViewer[0].value}";
     });
   }
 
   int? _getFontSizeByPos(int position) {
-    for (final setting in header.entries) {
-      if (setting.key == position) {
-        return setting.value.fontSize;
+    for (int i = 0; i < selectedViewer.length; i++) {
+      if (i == position) {
+        return selectedViewer[i].fontSize;
       }
     }
     return null;
   }
 
   Color? _getColorByPos(int position) {
-    for (var setting in header.entries) {
-      if (setting.key == position) {
-        return setting.value.color;
+    for (int i = 0; i < selectedViewer.length; i++) {
+      if (i == position) {
+        return selectedViewer[i].color;
       }
     }
     return null;
+  }
+
+  List<DraggableText> _getDraggablesText() {
+    List<DraggableText> draggables = [];
+    for (int i = 0; i < selectedViewer.length; i++) {
+      final draggable = DraggableText(
+        imageKey: imageKey!,
+        aereaKey: viewerKey,
+        currentPosition: selectedViewer.elementAt(i).position,
+        onPositionedText: (offset) {
+          selectedViewer.elementAt(i).position = offset;
+          certificateViewer
+              .elementAt(selectedViewerIndex)
+              .elementAt(i)
+              .position = offset;
+        },
+        fontSize: _getFontSizeByPos(i),
+        fontColor: _getColorByPos(i),
+        text: getWithNoSpaceAtTheEnd(selectedViewer[i].value),
+      );
+      draggables.add(draggable);
+    }
+    return draggables;
+  }
+
+  List<Widget> _getPreviewers() {
+    final List<Widget> previews = [];
+    for (int i = 0; i < certificateViewer.length; i++) {
+      previews.add(
+        Column(
+          children: [
+            InkWell(
+              onTap: () {
+                setState(() {
+                  selectedViewer = certificateViewer[i];
+                  selectedViewerIndex = i;
+                });
+              },
+              child: SizedBox(
+                height: 50,
+                width: 20,
+                child: ColoredBox(
+                  color: primaryColor,
+                  child: Text(
+                    "${i + 1}",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
+        ),
+      );
+    }
+    return previews;
   }
 }
