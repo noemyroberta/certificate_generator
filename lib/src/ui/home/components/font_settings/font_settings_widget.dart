@@ -1,48 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settins/input_increment_decrement.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/input_increment_decrement.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
 
 class FontSettings extends StatefulWidget {
   const FontSettings({
     super.key,
-    this.onColorPicked,
-    this.onFontSizeChanged,
+    required this.onColorPicked,
+    required this.onFontSizeChanged,
+    required this.fontSize,
+    required this.pickedColor,
   });
 
-  final Function(Color)? onColorPicked;
-  final Function(int)? onFontSizeChanged;
+  final ValueChanged<Color> onColorPicked;
+  final int fontSize;
+  final Color pickedColor;
+  final ValueChanged<int> onFontSizeChanged;
 
   @override
   State<FontSettings> createState() => _FontSettingsState();
 }
 
 class _FontSettingsState extends State<FontSettings> {
-  late Color pickedColor;
+  late Color _pickedColor;
 
   void changeColor(Color color) {
-    if (widget.onColorPicked != null) {
-      setState(() {
-        pickedColor = color;
-        widget.onColorPicked!(color);
-      });
-    }
+    setState(() {
+      _pickedColor = color;
+    });
+    widget.onColorPicked(color);
   }
 
   void changeSize(int size) {
-    if (widget.onFontSizeChanged != null) {
-      setState(() {
-        widget.onFontSizeChanged!(size);
-      });
-    }
+    widget.onFontSizeChanged(size);
   }
 
   @override
   void initState() {
-    pickedColor = primaryColor;
+    _pickedColor = primaryColor;
     super.initState();
   }
+
+  @override
+  void didUpdateWidget(covariant FontSettings oldWidget) {
+    if (oldWidget.pickedColor != widget.pickedColor) {
+      _pickedColor = widget.pickedColor;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +86,7 @@ class _FontSettingsState extends State<FontSettings> {
                   ),
                 ),
                 InputIncrementDecrement(
-                  initialValue: "20",
+                  initialValue: widget.fontSize,
                   onValueChanged: changeSize,
                 ),
               ],
@@ -99,7 +106,7 @@ class _FontSettingsState extends State<FontSettings> {
           title: const Text('Escolha a cor'),
           content: SingleChildScrollView(
             child: ColorPicker(
-              pickerColor: pickedColor,
+              pickerColor: _pickedColor,
               onColorChanged: changeColor,
             ),
           ),

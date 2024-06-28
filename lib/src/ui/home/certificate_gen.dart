@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_section.dart';
+import 'package:wit_md_certificate_gen/src/ui/home/components/generator.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
 import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
@@ -24,10 +25,12 @@ class CertificateGen extends StatefulWidget {
 class _CertificateGenState extends State<CertificateGen> {
   Uint8List? imageBytes;
   String imageName = '';
-  GlobalKey aereaKey = GlobalKey();
-  Map<int, Map<String, dynamic>> csv = {};
-  String selectedText = '';
-  int selectedIndex = 0;
+  GlobalKey? imageKey;
+  GlobalKey viewerKey = GlobalKey();
+  Offset position = const Offset(0, 0);
+  String initialText = "";
+  Map<int, FontSettingsEntity> header = {};
+  List<List<String>> rows = [];
 
   @override
   Widget build(BuildContext context) {
@@ -83,69 +86,54 @@ class _CertificateGenState extends State<CertificateGen> {
                             onPressed: _uploadFile,
                           ),
                           const SizedBox(height: 50),
-                          if (csv.isNotEmpty)
-                            const Text(
-                              'Selecione o texto para customizar',
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontFamily: 'RobotoSlab',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                              ),
-                            ),
-                          if (csv.isNotEmpty)
-                            DropdownButton<String>(
-                              value: selectedText,
-                              items: csv.entries.map((entry) {
-                                int index = entry.key;
-                                String text = entry.value['value'];
-
-                                return DropdownMenuItem<String>(
-                                  value: '#${index + 1} $text',
-                                  child: Text('#${index + 1} $text'),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
+                          Visibility(
+                            visible: header.isNotEmpty,
+                            child: FontSettingsSection(
+                              initialText: initialText,
+                              header: header,
+                              onTextChanged: (text) {
                                 setState(() {
-                                  selectedText = newValue!;
-                                  selectedIndex =
-                                      int.parse(newValue.substring(1, 2)) - 1;
+                                  header.update(text.$1, (value) => text.$2);
                                 });
                               },
                             ),
-                          if (csv.isNotEmpty)
-                            FontSettings(
-                              onFontSizeChanged: (newValue) {
-                                setState(() {
-                                  csv[selectedIndex]!['size'] = newValue;
-                                });
-                              },
-                              onColorPicked: (newColor) {
-                                setState(() {
-                                  csv[selectedIndex]!['color'] = newColor;
-                                });
-                              },
-                            ),
+                          ),
                         ],
                       ),
                     ),
                     CertificateViewer(
-                      key: aereaKey,
+                      key: viewerKey,
+                      imageKey: (key) => imageKey = key,
                       imageBytes: imageBytes,
                       imageName: imageName,
-                      texts: csv.isNotEmpty
-                          ? csv.entries.map((entry) {
+                      onDownload: () async {
+                        final gen = Generator(
+                          context: context,
+                          csv: rows,
+                          background: imageBytes!,
+                          settings: header.values.toList(),
+                        );
+                        await gen.create();
+                      },
+                      texts: header.isEmpty
+                          ? []
+                          : header.entries.map((entry) {
                               int index = entry.key;
-                              final value = entry.value;
+                              final setting = entry.value;
 
                               return DraggableText(
-                                aereaKey: aereaKey,
+                                imageKey: imageKey!,
+                                aereaKey: viewerKey,
+                                onPositionedText: (offset) {
+                                  position = offset;
+                                  header.values.elementAt(index).position =
+                                      offset;
+                                },
                                 fontSize: _getFontSizeByPos(index),
                                 fontColor: _getColorByPos(index),
-                                text: getWithNoSpaceAtTheEnd(value['value']),
+                                text: getWithNoSpaceAtTheEnd(setting.value),
                               );
-                            }).toList()
-                          : [],
+                            }).toList(),
                     ),
                   ],
                 ),
@@ -159,7 +147,6 @@ class _CertificateGenState extends State<CertificateGen> {
 
   String getWithNoSpaceAtTheEnd(String text) {
     if (text.endsWith(' ')) {
-      log('yes');
       String value = text.substring(0, text.length - 1);
       return value;
     }
@@ -189,42 +176,45 @@ class _CertificateGenState extends State<CertificateGen> {
       PlatformFile file = result.files.first;
       Uint8List fileBytes = file.bytes!;
       String content = utf8.decode(fileBytes);
-
-      List<List<dynamic>> csvTable =
-          const CsvToListConverter().convert(content);
-      _initializeFontSettings(csvTable);
+      rows = const CsvToListConverter(
+        shouldParseNumbers: false,
+        eol: "\n",
+      ).convert<String>(content, eol: "\n", shouldParseNumbers: false);
+      _initializeFontSettings(rows[0]);
     }
   }
 
-  void _initializeFontSettings(List<List<dynamic>> csvTable) {
-    if (csvTable.isNotEmpty) {
-      for (int i = 0; i < csvTable[0].length; i++) {
-        csv[i] = {
-          'value': csvTable[0][i].toString(),
-          'size': 20,
-          'color': Colors.black87,
-        };
-      }
+  void _initializeFontSettings(List<String> csvHeader) {
+    if (csvHeader.isEmpty) {
+      return;
     }
+
+    for (int i = 0; i < csvHeader.length; i++) {
+      header[i] = FontSettingsEntity(
+        csvHeader[i],
+        fontSize: 20,
+        color: Colors.black87,
+      );
+    }
+
     setState(() {
-      selectedIndex = 0;
-      selectedText = "#1 ${csv[0]!['value']}";
+      initialText = "#1 ${header[0]!.value}";
     });
   }
 
-  double? _getFontSizeByPos(int position) {
-    for (final setting in csv.entries) {
+  int? _getFontSizeByPos(int position) {
+    for (final setting in header.entries) {
       if (setting.key == position) {
-        return setting.value['size'];
+        return setting.value.fontSize;
       }
     }
     return null;
   }
 
   Color? _getColorByPos(int position) {
-    for (var element in csv.entries) {
-      if (element.key == position) {
-        return element.value['color'];
+    for (var setting in header.entries) {
+      if (setting.key == position) {
+        return setting.value.color;
       }
     }
     return null;
