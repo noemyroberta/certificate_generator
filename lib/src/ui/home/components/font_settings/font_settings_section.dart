@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_widget.dart';
+import 'package:certificate_generator/src/ui/home/components/font_settings/font_settings_entity.dart';
+import 'package:certificate_generator/src/ui/home/components/font_settings/font_settings_widget.dart';
 
 class FontSettingsSection extends StatefulWidget {
   const FontSettingsSection({

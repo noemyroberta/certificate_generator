@@ -11,7 +11,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
+import 'package:certificate_generator/src/ui/home/components/font_settings/font_settings_entity.dart';
 
 class GeneratorState extends ChangeNotifier {
   bool _downloading = false;

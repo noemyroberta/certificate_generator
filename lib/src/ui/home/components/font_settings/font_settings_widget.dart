@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/input_increment_decrement.dart';
-import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
-import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
+import 'package:certificate_generator/src/ui/home/components/font_settings/input_increment_decrement.dart';
+import 'package:certificate_generator/src/ui/widgets/colors.dart';
+import 'package:certificate_generator/src/ui/widgets/file_section.dart';
 
 class FontSettings extends StatefulWidget {
   const FontSettings({

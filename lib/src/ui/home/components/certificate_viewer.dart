@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/generator.dart';
-import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
+import 'package:certificate_generator/src/ui/home/components/generator.dart';
+import 'package:certificate_generator/src/ui/widgets/draggable_text.dart';
 
 import '../../widgets/colors.dart';
 

@@ -4,14 +4,14 @@ import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/certificate_viewer.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_entity.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/font_settings/font_settings_section.dart';
-import 'package:wit_md_certificate_gen/src/ui/home/components/generator.dart';
-import 'package:wit_md_certificate_gen/src/ui/widgets/colors.dart';
-import 'package:wit_md_certificate_gen/src/ui/widgets/draggable_text.dart';
-import 'package:wit_md_certificate_gen/src/ui/widgets/file_section.dart';
-import 'package:wit_md_certificate_gen/src/ui/widgets/strings.dart';
+import 'package:certificate_generator/src/ui/home/components/certificate_viewer.dart';
+import 'package:certificate_generator/src/ui/home/components/font_settings/font_settings_entity.dart';
+import 'package:certificate_generator/src/ui/home/components/font_settings/font_settings_section.dart';
+import 'package:certificate_generator/src/ui/home/components/generator.dart';
+import 'package:certificate_generator/src/ui/widgets/colors.dart';
+import 'package:certificate_generator/src/ui/widgets/draggable_text.dart';
+import 'package:certificate_generator/src/ui/widgets/file_section.dart';
+import 'package:certificate_generator/src/ui/widgets/strings.dart';
 
 import 'components/header.dart';
 
