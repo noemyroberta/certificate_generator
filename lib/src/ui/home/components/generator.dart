@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' show AnchorElement;
 
 import 'package:archive/archive.dart';
